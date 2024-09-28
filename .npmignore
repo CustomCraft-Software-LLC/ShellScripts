@@ -1,0 +1,17 @@
+# Ignore build files and other unnecessary files
+node_modules/
+npm-debug.log
+*.log
+.DS_Store
+.idea/
+*.tmp
+*.bak
+*.swp
+*.orig
+*.ts
+*.tsx
+
+# Ignore scripts if you don't want to include them
+scripts/
+docs/
+structure.txt

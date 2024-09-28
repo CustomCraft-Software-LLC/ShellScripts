@@ -1,6 +1,6 @@
 {
   "name": "customcraftsoftware-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "cli and shell scripts",
   "main": "./bin/cli.js",
   "bin": {
@@ -8,9 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint .",
-    "build": "node ./bin/cli.js build",
-    "prepare": "npm run build"
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
