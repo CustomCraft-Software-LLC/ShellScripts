@@ -2,12 +2,13 @@
 
 # Function to display usage
 usage() {
-  echo "Usage: $0 <ComponentName> [--tsx] [--jsx] [--stories] [--css]"
+  echo "Usage: $0 <ComponentName> [--tsx] [--jsx] [--stories] [--css] [--help]"
   echo "Options:"
   echo "  --tsx      Generate TypeScript (.tsx) component"
   echo "  --jsx      Generate JavaScript (.jsx) component"
   echo "  --stories  Include Storybook stories"
   echo "  --css      Include CSS file"
+  echo "  --help     Display this help message"
   exit 1
 }
 
@@ -39,6 +40,9 @@ while [[ $# -gt 0 ]]; do
     --css)
       INCLUDE_CSS=true
       ;;
+    --help)
+      usage
+      ;;
     *)
       usage
       ;;
@@ -46,9 +50,19 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-# If no component type is specified, default to TypeScript
+# If no component type is specified, prompt user for input
 if [ "$INCLUDE_TSX" = false ] && [ "$INCLUDE_JSX" = false ]; then
-  INCLUDE_TSX=true  # Default to TypeScript
+  echo "Please specify the component type."
+  echo "Select from the following options:"
+  read -p "Do you want to generate a TypeScript component? (y/n): " use_tsx
+  if [[ "$use_tsx" =~ ^[Yy]$ ]]; then
+    INCLUDE_TSX=true
+  fi
+
+  read -p "Do you want to generate a JavaScript component? (y/n): " use_jsx
+  if [[ "$use_jsx" =~ ^[Yy]$ ]]; then
+    INCLUDE_JSX=true
+  fi
 fi
 
 # Create component directory
@@ -79,7 +93,7 @@ EOL
     # Create Storybook file for TSX
     cat <<EOL > "src/components/$COMPONENT_NAME/$COMPONENT_NAME.stories.tsx"
 import React from 'react';
-import { Story, Meta } from '@storybook/react';
+import { StoryFn, Meta } from '@storybook/react';
 import $COMPONENT_NAME from './$COMPONENT_NAME';
 
 export default {
@@ -87,7 +101,7 @@ export default {
   component: $COMPONENT_NAME,
 } as Meta;
 
-const Template: Story<React.ComponentProps<typeof $COMPONENT_NAME>> = (args) => <${COMPONENT_NAME} {...args} />;
+const Template: StoryFn<React.ComponentProps<typeof $COMPONENT_NAME>> = (args) => <${COMPONENT_NAME} {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
@@ -125,7 +139,7 @@ EOL
     # Create Storybook file for JSX
     cat <<EOL > "src/components/$COMPONENT_NAME/$COMPONENT_NAME.stories.jsx"
 import React from 'react';
-import { Story, Meta } from '@storybook/react';
+import { StoryFn, Meta } from '@storybook/react';
 import $COMPONENT_NAME from './$COMPONENT_NAME';
 
 export default {
@@ -133,7 +147,7 @@ export default {
   component: $COMPONENT_NAME,
 } as Meta;
 
-const Template: Story = (args) => <${COMPONENT_NAME} {...args} />;
+const Template: StoryFn = (args) => <${COMPONENT_NAME} {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

@@ -1,50 +1,48 @@
-#!/usr/bin/env node
-
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-// Directory where scripts are located
 const scriptsDir = path.join(__dirname, '..', 'scripts');
 
-// Function to get all scripts in the scripts directory
-const getScripts = () => {
-  return fs.readdirSync(scriptsDir)
-    .filter(file => file.endsWith('.sh') || file.endsWith('.txt')) // Filter for shell scripts and text files
-    .map(file => path.basename(file, path.extname(file))); // Return filenames without extensions
-};
+// Get all script files from the scripts directory
+const scripts = fs.readdirSync(scriptsDir).map(file => file.replace('.sh', ''));
 
-// Function to run a script
-const runScript = (scriptName, additionalArgs) => {
-  const scriptPath = path.join(scriptsDir, `${scriptName}.sh`);
-
-  // Check if the script exists
-  if (!fs.existsSync(scriptPath)) {
+// Function to run a shell script
+const runScript = (scriptName) => {
+  const script = `${scriptName}.sh`;
+  const scriptPath = path.join(scriptsDir, script);
+  
+  if (!scripts.includes(scriptName)) {
     console.error(`Unknown script: ${scriptName}`);
-    console.log('Available scripts: ', getScripts().join(', '));
+    console.log(`Available scripts: ${scripts.join(', ')}`);
     process.exit(1);
   }
 
-  console.log(`Running ${scriptName}.sh...`);
-  
+  console.log(`Running ${script}...`);
   try {
-    execSync(`bash ${scriptPath} ${additionalArgs}`, { stdio: 'inherit' });
+    execSync(`bash ${scriptPath}`, { stdio: 'inherit' });
   } catch (error) {
-    console.error(`Failed to run ${scriptName}: ${error.message}`);
+    console.error(`Failed to run ${script}: ${error.message}`);
   }
 };
 
-// Get command-line arguments
+// Command handling
 const args = process.argv.slice(2);
 if (args.length === 0) {
-  console.log('Please provide a script name to run.');
-  console.log('Available scripts: ', getScripts().join(', '));
-  process.exit(0);
+  console.error('Please provide a command.');
+  process.exit(1);
 }
 
-// Check if the first argument is a script name and the rest are additional arguments
-const scriptName = args[0];
-const additionalArgs = args.slice(1).join(' '); // Join any additional arguments
+const command = args[0];
+const commandArgs = args.slice(1);
 
-// Run the specified script with additional arguments
-runScript(scriptName, additionalArgs);
+// Handle specific commands
+if (command === 'create_component') {
+  const componentName = commandArgs[0];
+  const options = commandArgs.slice(1);
+  
+  // Call the script responsible for creating components here
+  runScript(`create_component ${componentName} ${options.join(' ')}`);
+} else {
+  runScript(command);
+}
