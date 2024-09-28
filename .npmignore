@@ -1,5 +1,5 @@
 # Ignore build files and other unnecessary files
-node_modules/
+/node_modules/
 npm-debug.log
 *.log
 .DS_Store
@@ -12,6 +12,5 @@ npm-debug.log
 *.tsx
 
 # Ignore scripts if you don't want to include them
-scripts/
 docs/
 structure.txt

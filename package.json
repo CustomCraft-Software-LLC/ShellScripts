@@ -1,30 +1,38 @@
 {
   "name": "customcraftsoftware-cli",
-  "version": "1.0.1",
-  "description": "cli and shell scripts",
-  "main": "./bin/cli.js",
+  "version": "1.0.2",
+  "description": "CLI and shell scripts for component generation",
+  "main": "dist/customcraftsoftware-cli.js",
   "bin": {
-    "customcraftsoftware-cli": "./bin/cli.js"
+    "customcraftsoftware-cli": "dist/customcraftsoftware-cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CustomCraft-Software-LLC/ShellScripts.git"
+    "build": "node build.js",  
+    "clean": "bash ./scripts/clean_and_rebuild.sh",
+    "prepublishOnly": "npm run build"  
   },
   "keywords": [
     "cli",
     "shell",
     "scripts",
-    "scripting",
-    "react"
+    "react",
+    "component"
   ],
   "author": "CustomCraft Software, LLC",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CustomCraft-Software-LLC/ShellScripts.git"
+  },
   "bugs": {
     "url": "https://github.com/CustomCraft-Software-LLC/ShellScripts/issues"
   },
-  "homepage": "https://github.com/CustomCraft-Software-LLC/ShellScripts#readme"
+  "homepage": "https://github.com/CustomCraft-Software-LLC/ShellScripts#readme",
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "files": [
+    "dist/customcraftsoftware-cli.js",  
+    "dist/scripts/*"  
+  ]
 }
