@@ -1,17 +1,29 @@
 .
 ├── bin
 │   └── cli.js
+├── build.js
+├── dist
+│   ├── customcraftsoftware-cli.js
+│   └── scripts
+│       ├── build_size.sh
+│       ├── clean_and_rebuild.sh
+│       ├── create_component.sh
+│       ├── setup.sh
+│       ├── unused_imports_list.sh
+│       ├── unused_imports_uninstall.sh
+│       └── update_dependencies.sh
 ├── docs
 ├── package.json
-├── proper-structure.sh
+├── package-lock.json
 ├── README.md
 ├── scripts
 │   ├── build_size.sh
 │   ├── clean_and_rebuild.sh
+│   ├── create_component.sh
 │   ├── setup.sh
 │   ├── unused_imports_list.sh
 │   ├── unused_imports_uninstall.sh
 │   └── update_dependencies.sh
 └── structure.txt
 
-3 directories, 11 files
+5 directories, 21 files
