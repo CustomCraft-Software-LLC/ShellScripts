@@ -11,6 +11,9 @@
     "clean": "bash ./scripts/clean_and_rebuild.sh",
     "prepublishOnly": "npm run build"  
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "cli",
     "shell",
@@ -33,6 +36,8 @@
   },
   "files": [
     "dist/customcraftsoftware-cli.js",  
-    "dist/scripts/*"  
+    "dist/scripts/*",
+    "README.md",
+    "package.json" 
   ]
 }
