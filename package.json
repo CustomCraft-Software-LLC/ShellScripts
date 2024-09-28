@@ -7,7 +7,10 @@
     "customcraftsoftware-cli": "./bin/cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "build": "node ./bin/cli.js build",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
