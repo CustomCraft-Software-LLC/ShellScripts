@@ -1,0 +1,29 @@
+{
+  "name": "customcraftsoftware-cli",
+  "version": "1.0.0",
+  "description": "cli and shell scripts",
+  "main": "./bin/cli.js",
+  "bin": {
+    "customcraftsoftware-cli": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CustomCraft-Software-LLC/ShellScripts.git"
+  },
+  "keywords": [
+    "cli",
+    "shell",
+    "scripts",
+    "scripting",
+    "react"
+  ],
+  "author": "CustomCraft Software, LLC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CustomCraft-Software-LLC/ShellScripts/issues"
+  },
+  "homepage": "https://github.com/CustomCraft-Software-LLC/ShellScripts#readme"
+}

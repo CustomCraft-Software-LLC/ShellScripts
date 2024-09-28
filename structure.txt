@@ -1,0 +1,17 @@
+.
+├── bin
+│   └── cli.js
+├── docs
+├── package.json
+├── proper-structure.sh
+├── README.md
+├── scripts
+│   ├── build_size.sh
+│   ├── clean_and_rebuild.sh
+│   ├── setup.sh
+│   ├── unused_imports_list.sh
+│   ├── unused_imports_uninstall.sh
+│   └── update_dependencies.sh
+└── structure.txt
+
+3 directories, 11 files
