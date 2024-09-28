@@ -24,7 +24,8 @@ const runScript = (scriptName, args) => {
 
   console.log(`Running ${script}...`);
   try {
-    execSync(`bash ${script} ${args.join(' ')}`, { stdio: 'inherit' });
+    // Wrap the script path in quotes to handle spaces
+    execSync(`bash "${script}" ${args.join(' ')}`, { stdio: 'inherit' });
   } catch (error) {
     console.error(`Failed to run ${script}: ${error.message}`);
   }
@@ -46,22 +47,22 @@ switch (command) {
     runScript('create_component', args.slice(1));
     break;
   case 'build-size':
-    runScript('build_size');
+    runScript('build_size', []);
     break;
   case 'clean-and-rebuild':
-    runScript('clean_and_rebuild');
+    runScript('clean_and_rebuild', []);
     break;
   case 'setup':
-    runScript('setup');
+    runScript('setup', []);
     break;
   case 'unused-imports-list':
-    runScript('unused_imports_list');
+    runScript('unused_imports_list', []);
     break;
   case 'unused-imports-uninstall':
-    runScript('unused_imports_uninstall');
+    runScript('unused_imports_uninstall', []);
     break;
   case 'update-dependencies':
-    runScript('update_dependencies');
+    runScript('update_dependencies', []);
     break;
   default:
     console.error(`Unknown command: ${command}`);
