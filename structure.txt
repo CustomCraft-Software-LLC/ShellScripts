@@ -19,11 +19,15 @@
 ├── scripts
 │   ├── build_size.sh
 │   ├── clean_and_rebuild.sh
+│   ├── create_component_react_native.sh
 │   ├── create_component.sh
+│   ├── create_env.sh
+│   ├── create_route_gatsby.sh
+│   ├── create_screen_react_native.sh
 │   ├── setup.sh
 │   ├── unused_imports_list.sh
 │   ├── unused_imports_uninstall.sh
 │   └── update_dependencies.sh
 └── structure.txt
 
-5 directories, 21 files
+5 directories, 25 files

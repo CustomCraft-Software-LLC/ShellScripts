@@ -8,6 +8,12 @@ const scripts = {
   build_size: path.resolve(__dirname, '../scripts/build_size.sh'),
   clean_and_rebuild: path.resolve(__dirname, '../scripts/clean_and_rebuild.sh'),
   create_component: path.resolve(__dirname, '../scripts/create_component.sh'),
+  create_component_react_native: path.resolve(__dirname, '../scripts/create_component_react_native.sh'),
+  create_screen_react_native: path.resolve(__dirname, '../scripts/create_screen_react_native.sh'),
+  create_route_gatsby: path.resolve(__dirname, '../scripts/create_route_gatsby.sh'),
+  create_env: path.resolve(__dirname, '../scripts/create_env.sh'),
+  create_hook: path.resolve(__dirname, '../scripts/create_hook.sh'), // New script for creating hooks
+  analyze_bundle: path.resolve(__dirname, '../scripts/analyze_bundle.sh'), // New script for analyzing bundles
   setup: path.resolve(__dirname, '../scripts/setup.sh'),
   unused_imports_list: path.resolve(__dirname, '../scripts/unused_imports_list.sh'),
   unused_imports_uninstall: path.resolve(__dirname, '../scripts/unused_imports_uninstall.sh'),
@@ -28,6 +34,7 @@ const runScript = (scriptName, args) => {
     execSync(`bash "${script}" ${args.join(' ')}`, { stdio: 'inherit' });
   } catch (error) {
     console.error(`Failed to run ${script}: ${error.message}`);
+    process.exit(1);
   }
 };
 
@@ -35,7 +42,9 @@ const runScript = (scriptName, args) => {
 const args = process.argv.slice(2);
 if (args.length === 0) {
   console.log('Please provide a command to run.');
-  console.log('Available commands: create-component, build-size, clean-and-rebuild, setup, unused-imports-list, unused-imports-uninstall, update-dependencies');
+  console.log(
+    'Available commands: create-component, create-component-react-native, create-screen-react-native, create-env, create-route-gatsby, create-hook, build-size, clean-and-rebuild, setup, unused-imports-list, unused-imports-uninstall, update-dependencies, analyze-bundle'
+  );
   process.exit(0);
 }
 
@@ -43,8 +52,22 @@ if (args.length === 0) {
 const command = args[0];
 switch (command) {
   case 'create-component':
-    // Pass the rest of the arguments to the create_component script
     runScript('create_component', args.slice(1));
+    break;
+  case 'create-component-react-native':
+    runScript('create_component_react_native', args.slice(1));
+    break;
+  case 'create-screen-react-native':
+    runScript('create_screen_react_native', args.slice(1));
+    break;
+  case 'create-env':
+    runScript('create_env', []);
+    break;
+  case 'create-route-gatsby':
+    runScript('create_route_gatsby', args.slice(1));
+    break;
+  case 'create-hook': // Handle create-hook command
+    runScript('create_hook', args.slice(1));
     break;
   case 'build-size':
     runScript('build_size', []);
@@ -63,6 +86,9 @@ switch (command) {
     break;
   case 'update-dependencies':
     runScript('update_dependencies', []);
+    break;
+  case 'analyze-bundle': // Handle analyze-bundle command
+    runScript('analyze_bundle', []);
     break;
   default:
     console.error(`Unknown command: ${command}`);
