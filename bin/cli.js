@@ -7,7 +7,7 @@ const path = require('path');
 const scripts = {
   build_size: path.resolve(__dirname, '../scripts/build_size.sh'),
   clean_and_rebuild: path.resolve(__dirname, '../scripts/clean_and_rebuild.sh'),
-  clean_unused_dependencies: path.resolve(__dirname, '../scripts/clean-unused-dependencies.sh'),
+  clean_unused_dependencies: path.resolve(__dirname, '../scripts/clean_unused_dependencies.sh'),
   create_component: path.resolve(__dirname, '../scripts/create_component.sh'),
   create_component_react_native: path.resolve(__dirname, '../scripts/create_component_react_native.sh'),
   create_screen_react_native: path.resolve(__dirname, '../scripts/create_screen_react_native.sh'),
