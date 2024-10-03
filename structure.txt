@@ -5,9 +5,16 @@
 ├── dist
 │   ├── customcraftsoftware-cli.js
 │   └── scripts
+│       ├── analyze_bundle.sh
 │       ├── build_size.sh
 │       ├── clean_and_rebuild.sh
+│       ├── clean_unused_dependencies.sh
+│       ├── create_component_react_native.sh
 │       ├── create_component.sh
+│       ├── create_env.sh
+│       ├── create_hook.sh
+│       ├── create_route_gatsby.sh
+│       ├── create_screen_react_native.sh
 │       ├── setup.sh
 │       ├── unused_imports_list.sh
 │       ├── unused_imports_uninstall.sh
@@ -17,11 +24,14 @@
 ├── package-lock.json
 ├── README.md
 ├── scripts
+│   ├── analyze_bundle.sh
 │   ├── build_size.sh
 │   ├── clean_and_rebuild.sh
+│   ├── clean_unused_dependencies.sh
 │   ├── create_component_react_native.sh
 │   ├── create_component.sh
 │   ├── create_env.sh
+│   ├── create_hook.sh
 │   ├── create_route_gatsby.sh
 │   ├── create_screen_react_native.sh
 │   ├── setup.sh
@@ -30,4 +40,4 @@
 │   └── update_dependencies.sh
 └── structure.txt
 
-5 directories, 25 files
+5 directories, 35 files

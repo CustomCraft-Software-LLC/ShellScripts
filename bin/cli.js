@@ -2,68 +2,89 @@
 
 const { execSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
+const chalk = require('chalk');  // For colored output
+const columnify = require('columnify'); // For pretty-printed columns
 
-// Define paths to scripts using path.resolve
+// Helper function to resolve the correct script path
+const resolveScriptPath = (scriptName) => {
+  let distPath = path.resolve(__dirname, '../dist/scripts', scriptName);
+  if (fs.existsSync(distPath)) {
+    return distPath;
+  }
+
+  let srcPath = path.resolve(__dirname, '../scripts', scriptName);
+  if (fs.existsSync(srcPath)) {
+    return srcPath;
+  }
+
+  return null;
+};
+
+// Define script paths dynamically
 const scripts = {
-  build_size: path.resolve(__dirname, '../scripts/build_size.sh'),
-  clean_and_rebuild: path.resolve(__dirname, '../scripts/clean_and_rebuild.sh'),
-  clean_unused_dependencies: path.resolve(__dirname, '../scripts/clean_unused_dependencies.sh'),
-  create_component: path.resolve(__dirname, '../scripts/create_component.sh'),
-  create_component_react_native: path.resolve(__dirname, '../scripts/create_component_react_native.sh'),
-  create_screen_react_native: path.resolve(__dirname, '../scripts/create_screen_react_native.sh'),
-  create_route_gatsby: path.resolve(__dirname, '../scripts/create_route_gatsby.sh'),
-  create_env: path.resolve(__dirname, '../scripts/create_env.sh'),
-  create_hook: path.resolve(__dirname, '../scripts/create_hook.sh'),
-  analyze_bundle: path.resolve(__dirname, '../scripts/analyze_bundle.sh'),
-  setup: path.resolve(__dirname, '../scripts/setup.sh'),
-  unused_imports_list: path.resolve(__dirname, '../scripts/unused_imports_list.sh'),
-  unused_imports_uninstall: path.resolve(__dirname, '../scripts/unused_imports_uninstall.sh'),
-  update_dependencies: path.resolve(__dirname, '../scripts/update_dependencies.sh'),
+  build_size: resolveScriptPath('build_size.sh'),
+  clean_and_rebuild: resolveScriptPath('clean_and_rebuild.sh'),
+  clean_unused_dependencies: resolveScriptPath('clean_unused_dependencies.sh'),
+  create_component: resolveScriptPath('create_component.sh'),
+  create_component_react_native: resolveScriptPath('create_component_react_native.sh'),
+  create_screen_react_native: resolveScriptPath('create_screen_react_native.sh'),
+  create_route_gatsby: resolveScriptPath('create_route_gatsby.sh'),
+  create_env: resolveScriptPath('create_env.sh'),
+  create_hook: resolveScriptPath('create_hook.sh'),
+  analyze_bundle: resolveScriptPath('analyze_bundle.sh'),
+  setup: resolveScriptPath('setup.sh'),
+  unused_imports_list: resolveScriptPath('unused_imports_list.sh'),
+  unused_imports_uninstall: resolveScriptPath('unused_imports_uninstall.sh'),
+  update_dependencies: resolveScriptPath('update_dependencies.sh'),
 };
 
 // Command descriptions for help output
-const commandDescriptions = {
-  'create-component': 'Create a new component for the project.',
-  'create-component-react-native': 'Create a new React Native component.',
-  'create-screen-react-native': 'Create a new React Native screen.',
-  'create-env': 'Create a .env file with default settings.',
-  'create-route-gatsby': 'Create a new route in a Gatsby project.',
-  'create-hook': 'Create a custom React hook.',
-  'build-size': 'Get the size of the build.',
-  'clean-and-rebuild': 'Clean and rebuild the project.',
-  'clean-unused-dependencies': 'Remove unused dependencies from the project.',
-  'setup': 'Run project setup script.',
-  'unused-imports-list': 'List unused imports in the project.',
-  'unused-imports-uninstall': 'Uninstall packages that are no longer imported.',
-  'update-dependencies': 'Update project dependencies.',
-  'analyze-bundle': 'Analyze the project bundle size.',
-  'help': 'Show this help message.',
-};
+const commandDescriptions = [
+  { command: 'create-component', description: 'Create a new component for the project.' },
+  { command: 'create-component-react-native', description: 'Create a new React Native component.' },
+  { command: 'create-screen-react-native', description: 'Create a new React Native screen.' },
+  { command: 'create-env', description: 'Create a .env file with default settings.' },
+  { command: 'create-route-gatsby', description: 'Create a new route in a Gatsby project.' },
+  { command: 'create-hook', description: 'Create a custom React hook.' },
+  { command: 'build-size', description: 'Get the size of the build.' },
+  { command: 'clean-and-rebuild', description: 'Clean and rebuild the project.' },
+  { command: 'clean-unused-dependencies', description: 'Remove unused dependencies from the project.' },
+  { command: 'setup', description: 'Run project setup script.' },
+  { command: 'unused-imports-list', description: 'List unused imports in the project.' },
+  { command: 'unused-imports-uninstall', description: 'Uninstall packages that are no longer imported.' },
+  { command: 'update-dependencies', description: 'Update project dependencies.' },
+  { command: 'analyze-bundle', description: 'Analyze the project bundle size.' },
+  { command: 'help', description: 'Show this help message.' },
+];
 
 // Function to run a script
 const runScript = (scriptName, args) => {
   const script = scripts[scriptName];
   if (!script) {
-    console.error(`Unknown script: ${scriptName}`);
+    console.error(chalk.red(`Unknown script or script not found: ${scriptName}`));
     process.exit(1);
   }
 
-  console.log(`Running ${script}...`);
+  console.log(chalk.green(`Running ${script}...`));
   try {
-    // Wrap the script path in quotes to handle spaces
     execSync(`bash "${script}" ${args.join(' ')}`, { stdio: 'inherit' });
   } catch (error) {
-    console.error(`Failed to run ${script}: ${error.message}`);
+    console.error(chalk.red(`Failed to run ${script}: ${error.message}`));
     process.exit(1);
   }
 };
 
 // Function to show help message
 const showHelp = () => {
-  console.log('Available commands:');
-  for (const [command, description] of Object.entries(commandDescriptions)) {
-    console.log(`  ${command}: ${description}`);
-  }
+  console.log(chalk.bold.blue('Available commands:'));
+  
+  const columns = columnify(commandDescriptions, {
+    columnSplitter: '   ',  // Adjust spacing between columns
+    config: { description: { maxWidth: 60 } }  // Limits description width
+  });
+
+  console.log(chalk.yellow(columns));
 };
 
 // Get command-line arguments
@@ -122,7 +143,7 @@ switch (command) {
     showHelp();
     break;
   default:
-    console.error(`Unknown command: ${command}`);
+    console.error(chalk.red(`Unknown command: ${command}`));
     showHelp();
     process.exit(1);
 }

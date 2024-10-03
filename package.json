@@ -1,15 +1,15 @@
 {
   "name": "customcraftsoftware-cli",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "CLI and shell scripts for component generation",
   "main": "dist/customcraftsoftware-cli.js",
   "bin": {
     "customcraftsoftware-cli": "dist/customcraftsoftware-cli.js"
   },
   "scripts": {
-    "build": "node build.js",  
+    "build": "node build.js",
     "clean": "bash ./scripts/clean_and_rebuild.sh",
-    "prepublishOnly": "npm run build"  
+    "prepublishOnly": "npm run build"
   },
   "publishConfig": {
     "access": "public"
@@ -35,9 +35,13 @@
     "esbuild": "^0.24.0"
   },
   "files": [
-    "dist/customcraftsoftware-cli.js",  
+    "dist/customcraftsoftware-cli.js",
     "dist/scripts/*",
     "README.md",
-    "package.json" 
-  ]
+    "package.json"
+  ],
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "columnify": "^1.6.0"
+  }
 }
