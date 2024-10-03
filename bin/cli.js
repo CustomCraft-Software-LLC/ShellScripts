@@ -76,7 +76,7 @@ switch (command) {
   case 'clean-and-rebuild':
     runScript('clean_and_rebuild', []);
     break;
-  case 'clean-unused-dependencies':
+  case 'clean-nused-dependencies':
     runScript('clean_unused_dependencies', []);
     break;
   case 'setup':
