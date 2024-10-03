@@ -21,6 +21,25 @@ const scripts = {
   update_dependencies: path.resolve(__dirname, '../scripts/update_dependencies.sh'),
 };
 
+// Command descriptions for help output
+const commandDescriptions = {
+  'create-component': 'Create a new component for the project.',
+  'create-component-react-native': 'Create a new React Native component.',
+  'create-screen-react-native': 'Create a new React Native screen.',
+  'create-env': 'Create a .env file with default settings.',
+  'create-route-gatsby': 'Create a new route in a Gatsby project.',
+  'create-hook': 'Create a custom React hook.',
+  'build-size': 'Get the size of the build.',
+  'clean-and-rebuild': 'Clean and rebuild the project.',
+  'clean-unused-dependencies': 'Remove unused dependencies from the project.',
+  'setup': 'Run project setup script.',
+  'unused-imports-list': 'List unused imports in the project.',
+  'unused-imports-uninstall': 'Uninstall packages that are no longer imported.',
+  'update-dependencies': 'Update project dependencies.',
+  'analyze-bundle': 'Analyze the project bundle size.',
+  'help': 'Show this help message.',
+};
+
 // Function to run a script
 const runScript = (scriptName, args) => {
   const script = scripts[scriptName];
@@ -39,13 +58,18 @@ const runScript = (scriptName, args) => {
   }
 };
 
+// Function to show help message
+const showHelp = () => {
+  console.log('Available commands:');
+  for (const [command, description] of Object.entries(commandDescriptions)) {
+    console.log(`  ${command}: ${description}`);
+  }
+};
+
 // Get command-line arguments
 const args = process.argv.slice(2);
 if (args.length === 0) {
-  console.log('Please provide a command to run.');
-  console.log(
-    'Available commands: create-component, create-component-react-native, create-screen-react-native, create-env, create-route-gatsby, create-hook, build-size, clean-and-rebuild, setup, unused-imports-list, unused-imports-uninstall, update-dependencies, analyze-bundle'
-  );
+  showHelp();
   process.exit(0);
 }
 
@@ -94,7 +118,11 @@ switch (command) {
   case 'analyze-bundle':
     runScript('analyze_bundle', []);
     break;
+  case 'help':
+    showHelp();
+    break;
   default:
     console.error(`Unknown command: ${command}`);
+    showHelp();
     process.exit(1);
 }
