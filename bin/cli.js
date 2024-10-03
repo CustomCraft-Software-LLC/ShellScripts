@@ -7,13 +7,14 @@ const path = require('path');
 const scripts = {
   build_size: path.resolve(__dirname, '../scripts/build_size.sh'),
   clean_and_rebuild: path.resolve(__dirname, '../scripts/clean_and_rebuild.sh'),
+  clean_unused_dependencies: path.resolve(__dirname, '../scripts/clean-unused-dependencies.sh'),
   create_component: path.resolve(__dirname, '../scripts/create_component.sh'),
   create_component_react_native: path.resolve(__dirname, '../scripts/create_component_react_native.sh'),
   create_screen_react_native: path.resolve(__dirname, '../scripts/create_screen_react_native.sh'),
   create_route_gatsby: path.resolve(__dirname, '../scripts/create_route_gatsby.sh'),
   create_env: path.resolve(__dirname, '../scripts/create_env.sh'),
-  create_hook: path.resolve(__dirname, '../scripts/create_hook.sh'), // New script for creating hooks
-  analyze_bundle: path.resolve(__dirname, '../scripts/analyze_bundle.sh'), // New script for analyzing bundles
+  create_hook: path.resolve(__dirname, '../scripts/create_hook.sh'),
+  analyze_bundle: path.resolve(__dirname, '../scripts/analyze_bundle.sh'),
   setup: path.resolve(__dirname, '../scripts/setup.sh'),
   unused_imports_list: path.resolve(__dirname, '../scripts/unused_imports_list.sh'),
   unused_imports_uninstall: path.resolve(__dirname, '../scripts/unused_imports_uninstall.sh'),
@@ -66,7 +67,7 @@ switch (command) {
   case 'create-route-gatsby':
     runScript('create_route_gatsby', args.slice(1));
     break;
-  case 'create-hook': // Handle create-hook command
+  case 'create-hook':
     runScript('create_hook', args.slice(1));
     break;
   case 'build-size':
@@ -74,6 +75,9 @@ switch (command) {
     break;
   case 'clean-and-rebuild':
     runScript('clean_and_rebuild', []);
+    break;
+  case 'clean-unused-dependencies':
+    runScript('clean_unused_dependencies', []);
     break;
   case 'setup':
     runScript('setup', []);
@@ -87,7 +91,7 @@ switch (command) {
   case 'update-dependencies':
     runScript('update_dependencies', []);
     break;
-  case 'analyze-bundle': // Handle analyze-bundle command
+  case 'analyze-bundle':
     runScript('analyze_bundle', []);
     break;
   default:
