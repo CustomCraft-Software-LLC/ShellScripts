@@ -4,6 +4,17 @@ const path = require('path');
 jest.mock('child_process');
 jest.mock('fs');
 
+// Mock process.exit globally for all tests
+beforeAll(() => {
+  jest.spyOn(process, 'exit').mockImplementation((code) => {
+    throw new Error(`process.exit(${code}) was called.`);
+  });
+});
+
+afterAll(() => {
+  process.exit.mockRestore(); // Restore the original behavior after tests
+});
+
 const runScript = require('../bin/cli').runScript;
 
 describe('CLI script execution tests', () => {
@@ -22,17 +33,6 @@ describe('CLI script execution tests', () => {
     { name: 'unused_imports_uninstall', script: 'unused_imports_uninstall.sh' },
     { name: 'update_dependencies', script: 'update_dependencies.sh' }
   ];
-
-  // Mocking process.exit globally for all tests
-  beforeAll(() => {
-    jest.spyOn(process, 'exit').mockImplementation((code) => {
-      throw new Error(`process.exit(${code}) was called.`);
-    });
-  });
-
-  afterAll(() => {
-    process.exit.mockRestore(); // Restore original behavior after tests
-  });
 
   scripts.forEach(({ name, script }) => {
     describe(`${script}`, () => {

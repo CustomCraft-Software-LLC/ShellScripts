@@ -62,22 +62,23 @@ const commandDescriptions = [
 const runScript = (scriptName, args) => {
   const script = scripts[scriptName];
   if (!script) {
-    console.error(chalk.red(`Unknown script or script not found: ${scriptName}`));
+    console.error(chalk.red(`❌ Unknown script or script not found: ${chalk.bold(scriptName)}`));
     process.exit(1);
   }
 
-  console.log(chalk.green(`Running ${script}...`));
+  console.log(chalk.green(`🚀 Running ${chalk.bold(script)}...`));
   try {
     execSync(`bash "${script}" ${args.join(' ')}`, { stdio: 'inherit' });
+    console.log(chalk.green(`✅ Script ${chalk.bold(script)} completed successfully!`));
   } catch (error) {
-    console.error(chalk.red(`Failed to run ${script}: ${error.message}`));
+    console.error(chalk.red(`❌ Failed to run ${chalk.bold(script)}: ${error.message}`));
     process.exit(1);
   }
 };
 
 // Function to show help message
 const showHelp = () => {
-  console.log(chalk.bold.blue('Available commands:'));
+  console.log(chalk.bold.blue('📜 Available commands:'));
   
   const columns = columnify(commandDescriptions, {
     columnSplitter: '   ',  // Adjust spacing between columns
@@ -143,7 +144,7 @@ switch (command) {
     showHelp();
     break;
   default:
-    console.error(chalk.red(`Unknown command: ${command}`));
+    console.error(chalk.red(`❌ Unknown command: ${chalk.bold(command)}`));
     showHelp();
     process.exit(1);
 }
