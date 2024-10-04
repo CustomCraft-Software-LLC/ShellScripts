@@ -8,12 +8,12 @@ const columnify = require('columnify'); // For pretty-printed columns
 
 // Helper function to resolve the correct script path
 const resolveScriptPath = (scriptName) => {
-  let distPath = path.resolve(__dirname, '../dist/scripts', scriptName);
+  const distPath = path.resolve(__dirname, '../dist/scripts', scriptName);
   if (fs.existsSync(distPath)) {
     return distPath;
   }
 
-  let srcPath = path.resolve(__dirname, '../scripts', scriptName);
+  const srcPath = path.resolve(__dirname, '../scripts', scriptName);
   if (fs.existsSync(srcPath)) {
     return srcPath;
   }
@@ -63,6 +63,14 @@ const runScript = (scriptName, args) => {
   const script = scripts[scriptName];
   if (!script) {
     console.error(chalk.red(`❌ Unknown script or script not found: ${chalk.bold(scriptName)}`));
+    process.exit(1);
+  }
+
+  // Check if the script is executable
+  try {
+    fs.accessSync(script, fs.constants.X_OK);
+  } catch (error) {
+    console.error(chalk.red(`❌ Script is not executable: ${chalk.bold(script)}`));
     process.exit(1);
   }
 

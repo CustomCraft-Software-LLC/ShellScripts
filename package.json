@@ -1,6 +1,6 @@
 {
   "name": "customcraftsoftware-cli",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "CLI and shell scripts for component generation",
   "main": "dist/customcraftsoftware-cli.js",
   "bin": {
