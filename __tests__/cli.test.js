@@ -1,64 +1,61 @@
-#!/usr/bin/env node
-
 const { execSync } = require('child_process');
-const path = require('path');
 const fs = require('fs');
-const chalk = require('chalk');
+const path = require('path');
+jest.mock('child_process');
+jest.mock('fs');
 
-// Helper function to resolve the correct script path
-const resolveScriptPath = (scriptName) => {
-  let distPath = path.resolve(__dirname, '../dist/scripts', scriptName);
-  if (fs.existsSync(distPath)) {
-    return distPath;
-  }
+const runScript = require('../bin/cli').runScript;
 
-  let srcPath = path.resolve(__dirname, '../scripts', scriptName);
-  if (fs.existsSync(srcPath)) {
-    return srcPath;
-  }
+describe('CLI script execution tests', () => {
+  const scripts = [
+    { name: 'build_size', script: 'build_size.sh' },
+    { name: 'clean_and_rebuild', script: 'clean_and_rebuild.sh' },
+    { name: 'create_component', script: 'create_component.sh' },
+    { name: 'create_component_react_native', script: 'create_component_react_native.sh' },
+    { name: 'create_screen_react_native', script: 'create_screen_react_native.sh' },
+    { name: 'create_route_gatsby', script: 'create_route_gatsby.sh' },
+    { name: 'create_env', script: 'create_env.sh' },
+    { name: 'create_hook', script: 'create_hook.sh' },
+    { name: 'analyze_bundle', script: 'analyze_bundle.sh' },
+    { name: 'setup', script: 'setup.sh' },
+    { name: 'unused_imports_list', script: 'unused_imports_list.sh' },
+    { name: 'unused_imports_uninstall', script: 'unused_imports_uninstall.sh' },
+    { name: 'update_dependencies', script: 'update_dependencies.sh' }
+  ];
 
-  return null;
-};
+  // Mocking process.exit globally for all tests
+  beforeAll(() => {
+    jest.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`process.exit(${code}) was called.`);
+    });
+  });
 
-// Define the list of scripts to test
-const scripts = [
-  'build_size.sh',
-  'clean_and_rebuild.sh',
-  'clean_unused_dependencies.sh',
-  'create_component.sh',
-  'create_component_react_native.sh',
-  'create_screen_react_native.sh',
-  'create_route_gatsby.sh',
-  'create_env.sh',
-  'create_hook.sh',
-  'analyze_bundle.sh',
-  'setup.sh',
-  'unused_imports_list.sh',
-  'unused_imports_uninstall.sh',
-  'update_dependencies.sh',
-];
+  afterAll(() => {
+    process.exit.mockRestore(); // Restore original behavior after tests
+  });
 
-// Function to run a script
-const runScript = (scriptName) => {
-  const scriptPath = resolveScriptPath(scriptName);
-  if (!scriptPath) {
-    console.error(chalk.red(`Script not found: ${scriptName}`));
-    return;
-  }
+  scripts.forEach(({ name, script }) => {
+    describe(`${script}`, () => {
+      const mockScriptPath = path.resolve(__dirname, `../dist/scripts/${script}`);
 
-  console.log(chalk.blue(`Running ${scriptName}...`));
-  try {
-    execSync(`bash "${scriptPath}"`, { stdio: 'inherit' });
-    console.log(chalk.green(`${scriptName} executed successfully.`));
-  } catch (error) {
-    console.error(chalk.red(`Failed to run ${scriptName}: ${error.message}`));
-  }
-};
+      beforeEach(() => {
+        jest.clearAllMocks();
+        fs.existsSync.mockReturnValue(true); // Mock script exists
+        jest.spyOn(path, 'resolve').mockReturnValue(mockScriptPath);
+      });
 
-// Run all scripts
-const runAllScripts = () => {
-  scripts.forEach(runScript);
-};
+      test(`should execute ${script} successfully`, () => {
+        execSync.mockImplementation(() => {});
 
-// Execute the test runner
-runAllScripts();
+        expect(() => runScript(name, [])).not.toThrow();
+        expect(execSync).toHaveBeenCalledWith(`bash "${mockScriptPath}"`, { stdio: 'inherit' });
+      });
+
+      test(`should throw error if ${script} is missing`, () => {
+        fs.existsSync.mockReturnValue(false); // Mock script doesn't exist
+
+        expect(() => runScript(name, [])).toThrow(`Unknown script or script not found: ${name}`);
+      });
+    });
+  });
+});

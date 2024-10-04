@@ -20,6 +20,7 @@
 │       ├── unused_imports_uninstall.sh
 │       └── update_dependencies.sh
 ├── docs
+├── jest.config.js
 ├── package.json
 ├── package-lock.json
 ├── README.md
@@ -38,6 +39,8 @@
 │   ├── unused_imports_list.sh
 │   ├── unused_imports_uninstall.sh
 │   └── update_dependencies.sh
-└── structure.txt
+├── structure.txt
+└── __tests__
+    └── cli.test.js
 
-5 directories, 35 files
+6 directories, 37 files
