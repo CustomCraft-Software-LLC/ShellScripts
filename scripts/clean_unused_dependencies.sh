@@ -20,24 +20,20 @@ else
     echo -e "${BOLD_GREEN}depcheck is already installed.${NC}"
 fi
 
-# Check if jq is installed, and exit if not
-if ! check_command jq; then
-    echo -e "${BOLD_YELLOW}jq is not installed. Please install it to continue.${NC}"
-    exit 1
-fi
-
 echo -e "${BOLD_CYAN}Checking for unused dependencies...${NC}"
 
-# Run depcheck to find unused dependencies
-# Use absolute paths to ensure consistent behavior
+# Run depcheck to find unused dependencies and capture the JSON output
 depcheck_output=$(npx depcheck --json)
+
+# Check if depcheck ran successfully
 if [ $? -ne 0 ]; then
     echo -e "${BOLD_RED}Error running depcheck. Please check your setup.${NC}"
     exit 1
 fi
 
-# Extract unused dependencies
-unused_deps=$(echo "$depcheck_output" | jq -r '.dependencies | keys[]')
+# Extract unused dependencies using basic string manipulation
+# Searching for the "dependencies" key in the output
+unused_deps=$(echo "$depcheck_output" | grep -o '"dependencies":{[^}]*}' | sed -e 's/"dependencies":{//' -e 's/}//' -e 's/"//g' -e 's/: / /g' | tr ' ' '\n' | awk NF)
 
 if [ -z "$unused_deps" ]; then
     echo -e "${BOLD_GREEN}No unused dependencies found.${NC}"
