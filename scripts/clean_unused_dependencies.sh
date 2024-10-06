@@ -38,7 +38,7 @@ install_jq() {
         echo -e "${BOLD_YELLOW}Detected Windows. Attempting to install jq using winget or choco...${NC}"
         if check_command winget; then
             echo -e "${BOLD_CYAN}Using winget to install jq...${NC}"
-            winget install jq
+            winget install --id jqlang.jq  # Specific package ID for jq in winget
         elif check_command choco; then
             echo -e "${BOLD_CYAN}Using Chocolatey to install jq...${NC}"
             choco install jq -y
