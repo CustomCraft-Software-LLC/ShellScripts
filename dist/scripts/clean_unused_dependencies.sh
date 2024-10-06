@@ -35,16 +35,45 @@ install_jq() {
         fi
     elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
         # Windows
-        echo -e "${BOLD_YELLOW}Please download and install jq from https://stedolan.github.io/jq/download/ for Windows.${NC}"
-        exit 1
+        echo -e "${BOLD_YELLOW}Detected Windows. Attempting to install jq using winget or choco...${NC}"
+        if check_command winget; then
+            echo -e "${BOLD_CYAN}Using winget to install jq...${NC}"
+            winget install jq
+        elif check_command choco; then
+            echo -e "${BOLD_CYAN}Using Chocolatey to install jq...${NC}"
+            choco install jq -y
+        else
+            echo -e "${BOLD_RED}winget or Chocolatey not found. Please install one of these package managers to proceed.${NC}"
+            exit 1
+        fi
     else
         echo -e "${BOLD_RED}Unsupported OS. Please install jq manually.${NC}"
         exit 1
     fi
 }
 
-# Prompt to ask if the user agrees to install jq
-ask_install_jq() {
+# Function to install depcheck
+install_depcheck() {
+    echo -e "${BOLD_YELLOW}depcheck is not installed. Do you want to install it? (y/n): ${NC}"
+    read -p "" confirm
+    if [[ $confirm == [yY] ]]; then
+        npm install -g depcheck
+        echo -e "${BOLD_GREEN}depcheck has been installed.${NC}"
+    else
+        echo -e "${BOLD_RED}depcheck installation declined. Exiting.${NC}"
+        exit 1
+    fi
+}
+
+# Ensure depcheck is installed
+if ! check_command depcheck; then
+    install_depcheck
+else
+    echo -e "${BOLD_GREEN}depcheck is already installed.${NC}"
+fi
+
+# Ensure jq is installed (for parsing JSON)
+if ! check_command jq; then
     read -p "jq is required but not installed. Do you want to install it? (y/n): " confirm
     if [[ $confirm == [yY] ]]; then
         install_jq
@@ -52,19 +81,6 @@ ask_install_jq() {
         echo -e "${BOLD_RED}jq installation declined. Exiting.${NC}"
         exit 1
     fi
-}
-
-# Ensure depcheck is installed
-if ! check_command depcheck; then
-    echo -e "${BOLD_YELLOW}depcheck is not installed. Installing...${NC}"
-    npm install -g depcheck
-else
-    echo -e "${BOLD_GREEN}depcheck is already installed.${NC}"
-fi
-
-# Ensure jq is installed (for parsing JSON)
-if ! check_command jq; then
-    ask_install_jq
 else
     echo -e "${BOLD_GREEN}jq is already installed.${NC}"
 fi

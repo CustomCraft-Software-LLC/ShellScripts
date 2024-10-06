@@ -35,8 +35,17 @@ install_jq() {
         fi
     elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
         # Windows
-        echo -e "${BOLD_YELLOW}Please download and install jq from https://stedolan.github.io/jq/download/ for Windows.${NC}"
-        exit 1
+        echo -e "${BOLD_YELLOW}Detected Windows. Attempting to install jq using winget or choco...${NC}"
+        if check_command winget; then
+            echo -e "${BOLD_CYAN}Using winget to install jq...${NC}"
+            winget install jq
+        elif check_command choco; then
+            echo -e "${BOLD_CYAN}Using Chocolatey to install jq...${NC}"
+            choco install jq -y
+        else
+            echo -e "${BOLD_RED}winget or Chocolatey not found. Please install one of these package managers to proceed.${NC}"
+            exit 1
+        fi
     else
         echo -e "${BOLD_RED}Unsupported OS. Please install jq manually.${NC}"
         exit 1
