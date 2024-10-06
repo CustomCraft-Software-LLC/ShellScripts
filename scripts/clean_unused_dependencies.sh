@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Define basic color codes
+# Define basic color codes for feedback
 BOLD_GREEN='\033[1;32m'
 BOLD_RED='\033[1;31m'
 BOLD_YELLOW='\033[1;33m'
@@ -58,6 +58,10 @@ install_depcheck() {
     read -p "" confirm
     if [[ $confirm == [yY] ]]; then
         npm install -g depcheck
+        if [ $? -ne 0 ]; then
+            echo -e "${BOLD_RED}Error installing depcheck. Exiting.${NC}"
+            exit 1
+        fi
         echo -e "${BOLD_GREEN}depcheck has been installed.${NC}"
     else
         echo -e "${BOLD_RED}depcheck installation declined. Exiting.${NC}"
@@ -74,7 +78,8 @@ fi
 
 # Ensure jq is installed (for parsing JSON)
 if ! check_command jq; then
-    read -p "jq is required but not installed. Do you want to install it? (y/n): " confirm
+    echo -e "${BOLD_YELLOW}jq is required but not installed. Do you want to install it? (y/n): ${NC}" 
+    read -p "" confirm
     if [[ $confirm == [yY] ]]; then
         install_jq
     else
@@ -88,12 +93,28 @@ fi
 # Run depcheck in the current directory
 echo -e "${BOLD_CYAN}Checking for unused dependencies...${NC}"
 
-depcheck_output=$(npx depcheck --json 2>&1) # Capture stdout and stderr
+# Run depcheck and capture both stdout and stderr
+depcheck_output=$(npx depcheck --json 2>&1)
 
-# Check if depcheck ran successfully
-if [ $? -ne 0 ]; then
-    echo -e "${BOLD_RED}Error running depcheck:${NC}"
-    echo "$depcheck_output"  # Show the error details
+# Debugging: Show raw output from depcheck
+echo -e "${BOLD_YELLOW}Raw depcheck output:${NC}"
+echo "$depcheck_output"
+
+# Check if the output contains valid JSON (i.e., depcheck ran successfully)
+if echo "$depcheck_output" | jq empty &>/dev/null; then
+    echo -e "${BOLD_GREEN}depcheck ran successfully.${NC}"
+else
+    # If JSON is invalid, display the error message
+    echo -e "${BOLD_RED}Error: depcheck did not produce valid JSON. Exiting.${NC}"
+    echo -e "${BOLD_RED}Depcheck Output:${NC}"
+    echo "$depcheck_output"
+    exit 1
+fi
+
+# Check if depcheck output is valid JSON (in case of unexpected errors)
+if ! echo "$depcheck_output" | jq empty &>/dev/null; then
+    echo -e "${BOLD_RED}Invalid JSON output from depcheck. Exiting.${NC}"
+    echo "$depcheck_output"
     exit 1
 fi
 
@@ -115,7 +136,11 @@ read -p "Remove these dependencies? (y/n): " confirm
 if [[ $confirm == [yY] ]]; then
     echo -e "${BOLD_CYAN}Removing unused dependencies...${NC}"
     npm uninstall $unused_deps
-    echo -e "${BOLD_GREEN}Unused dependencies removed.${NC}"
+    if [ $? -ne 0 ]; then
+        echo -e "${BOLD_RED}Error occurred while uninstalling dependencies.${NC}"
+    else
+        echo -e "${BOLD_GREEN}Unused dependencies removed.${NC}"
+    fi
 else
     echo -e "${BOLD_YELLOW}No changes made.${NC}"
 fi
