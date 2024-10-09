@@ -70,7 +70,24 @@ const suggestSimilarCommands = (command) => {
     }
 };
 
-// Function to run a script with a loading spinner
+// Function to ensure logs directory exists
+const ensureLogDirectory = () => {
+    const logDir = path.resolve(__dirname, '../logs');
+    if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir);
+    }
+    return logDir;
+};
+
+// Function to create a log file with timestamp
+const createLogFile = (scriptName) => {
+    const logDir = ensureLogDirectory();
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const logFilePath = path.join(logDir, `${scriptName}-${timestamp}.log`);
+    return logFilePath;
+};
+
+// Function to run a script with a loading spinner and log output
 const runScript = (scriptName, args) => {
     const script = scripts[scriptName];
     if (!script) {
@@ -89,18 +106,28 @@ const runScript = (scriptName, args) => {
     }
 
     console.log(chalk.green(`🚀 Running ${chalk.bold(script)}...`));
-    
+
+    // Create log file
+    const logFilePath = createLogFile(scriptName);
+    console.log(chalk.yellow(`📄 Logs are being written to: ${chalk.bold(logFilePath)}`));
+
     // Simple loading spinner
     const spinner = startSpinner();
-    
+
+    // Execute script and log output
     try {
-        execSync(`bash "${script}" ${args.join(' ')}`, { stdio: 'inherit' });
+        const result = execSync(`bash "${script}" ${args.join(' ')}`, { stdio: 'pipe' });
+
+        // Write both stdout and stderr to the log file
+        fs.writeFileSync(logFilePath, result.toString());
         spinner.stop();
         console.log(chalk.green(`✅ Script ${chalk.bold(script)} completed successfully!`));
     } catch (error) {
         spinner.stop();
+        // Write the error to log file
+        fs.writeFileSync(logFilePath, error.stdout.toString() + error.stderr.toString());
         console.error(chalk.red(`❌ Failed to run ${chalk.bold(script)}: ${error.message}`));
-        console.error(chalk.yellow(`💡 Check the script for errors or missing dependencies.`));
+        console.error(chalk.yellow(`💡 Check the logs for details: ${chalk.bold(logFilePath)}`));
         process.exit(1);
     }
 };

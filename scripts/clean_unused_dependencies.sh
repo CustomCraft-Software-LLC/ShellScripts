@@ -7,140 +7,84 @@ BOLD_YELLOW='\033[1;33m'
 BOLD_CYAN='\033[1;36m'
 NC='\033[0m' # No Color
 
-# Function to check if a command is available
+# Function to check if a command exists
 check_command() {
     command -v "$1" &> /dev/null
 }
 
-# Function to install jq based on OS
+# Function to install jq if it's not installed
 install_jq() {
-    echo -e "${BOLD_YELLOW}Attempting to install jq...${NC}"
+    echo -e "${BOLD_YELLOW}Installing jq...${NC}"
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        # Linux (Debian-based)
-        if check_command apt; then
-            sudo apt-get update && sudo apt-get install -y jq
-        elif check_command yum; then
-            sudo yum install -y jq
-        else
-            echo -e "${BOLD_RED}Unsupported Linux distribution. Please install jq manually.${NC}"
-            exit 1
-        fi
+        sudo apt-get update && sudo apt-get install -y jq
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS
-        if check_command brew; then
-            brew install jq
-        else
-            echo -e "${BOLD_RED}Homebrew not found. Please install Homebrew and try again.${NC}"
-            exit 1
-        fi
+        brew install jq
     elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-        # Windows
-        echo -e "${BOLD_YELLOW}Detected Windows. Attempting to install jq using winget or choco...${NC}"
-        if check_command winget; then
-            echo -e "${BOLD_CYAN}Using winget to install jq...${NC}"
-            winget install --id jqlang.jq  # Specific package ID for jq in winget
-        elif check_command choco; then
-            echo -e "${BOLD_CYAN}Using Chocolatey to install jq...${NC}"
-            choco install jq -y
-        else
-            echo -e "${BOLD_RED}winget or Chocolatey not found. Please install one of these package managers to proceed.${NC}"
-            exit 1
-        fi
+        winget install --id jqlang.jq
     else
-        echo -e "${BOLD_RED}Unsupported OS. Please install jq manually.${NC}"
+        echo -e "${BOLD_RED}Unsupported OS for automatic jq installation. Please install jq manually.${NC}"
         exit 1
     fi
 }
 
-# Function to install depcheck
-install_depcheck() {
-    echo -e "${BOLD_YELLOW}depcheck is not installed. Do you want to install it? (y/n): ${NC}"
-    read -p "" confirm
-    if [[ $confirm == [yY] ]]; then
-        npm install -g depcheck
-        if [ $? -ne 0 ]; then
-            echo -e "${BOLD_RED}Error installing depcheck. Exiting.${NC}"
-            exit 1
-        fi
-        echo -e "${BOLD_GREEN}depcheck has been installed.${NC}"
-    else
-        echo -e "${BOLD_RED}depcheck installation declined. Exiting.${NC}"
-        exit 1
-    fi
-}
-
-# Ensure depcheck is installed
-if ! check_command depcheck; then
-    install_depcheck
-else
-    echo -e "${BOLD_GREEN}depcheck is already installed.${NC}"
-fi
-
-# Ensure jq is installed (for parsing JSON)
-if ! check_command jq; then
-    echo -e "${BOLD_YELLOW}jq is required but not installed. Do you want to install it? (y/n): ${NC}" 
-    read -p "" confirm
-    if [[ $confirm == [yY] ]]; then
+# Ensure jq is installed
+ensure_jq() {
+    if ! check_command jq; then
         install_jq
     else
-        echo -e "${BOLD_RED}jq installation declined. Exiting.${NC}"
-        exit 1
+        echo -e "${BOLD_GREEN}jq is already installed.${NC}"
     fi
-else
-    echo -e "${BOLD_GREEN}jq is already installed.${NC}"
-fi
+}
 
-# Run depcheck in the current directory
-echo -e "${BOLD_CYAN}Checking for unused dependencies...${NC}"
+# Function to clean unused dependencies from package.json
+clean_unused_dependencies() {
+    echo -e "${BOLD_CYAN}Checking for unused dependencies in package.json...${NC}"
 
-# Run depcheck and capture both stdout and stderr
-depcheck_output=$(npx depcheck --json 2>&1)
+    # Extract all dependencies from package.json
+    all_deps=$(jq -r '.dependencies, .devDependencies | keys[]' package.json)
 
-# Debugging: Show raw output from depcheck
-echo -e "${BOLD_YELLOW}Raw depcheck output:${NC}"
-echo "$depcheck_output"
+    # Compare with actual imports and find unused dependencies
+    unused_deps=()
+    for dep in $all_deps; do
+        # If the dependency is not found in any of the project's source files, add it to the unused list
+        if ! grep -qr "$dep" .; then
+            unused_deps+=("$dep")
+        fi
+    done
 
-# Check if the output contains valid JSON (i.e., depcheck ran successfully)
-if echo "$depcheck_output" | jq empty &>/dev/null; then
-    echo -e "${BOLD_GREEN}depcheck ran successfully.${NC}"
-else
-    # If JSON is invalid, display the error message
-    echo -e "${BOLD_RED}Error: depcheck did not produce valid JSON. Exiting.${NC}"
-    echo -e "${BOLD_RED}Depcheck Output:${NC}"
-    echo "$depcheck_output"
-    exit 1
-fi
-
-# Check if depcheck output is valid JSON (in case of unexpected errors)
-if ! echo "$depcheck_output" | jq empty &>/dev/null; then
-    echo -e "${BOLD_RED}Invalid JSON output from depcheck. Exiting.${NC}"
-    echo "$depcheck_output"
-    exit 1
-fi
-
-# Extract unused dependencies from the depcheck output using jq
-unused_deps=$(echo "$depcheck_output" | jq -r '.dependencies[]')
-
-# If no unused dependencies are found
-if [ -z "$unused_deps" ]; then
-    echo -e "${BOLD_GREEN}No unused dependencies found.${NC}"
-    exit 0
-else
-    echo -e "${BOLD_RED}Unused dependencies found:${NC}"
-    echo -e "${BOLD_YELLOW}$unused_deps${NC}"
-fi
-
-# Prompt the user for confirmation to remove the dependencies
-read -p "Remove these dependencies? (y/n): " confirm
-
-if [[ $confirm == [yY] ]]; then
-    echo -e "${BOLD_CYAN}Removing unused dependencies...${NC}"
-    npm uninstall $unused_deps
-    if [ $? -ne 0 ]; then
-        echo -e "${BOLD_RED}Error occurred while uninstalling dependencies.${NC}"
+    # If no unused dependencies are found, exit
+    if [ ${#unused_deps[@]} -eq 0 ]; then
+        echo -e "${BOLD_GREEN}No unused dependencies found in package.json.${NC}"
+        exit 0
     else
-        echo -e "${BOLD_GREEN}Unused dependencies removed.${NC}"
+        echo -e "${BOLD_RED}Unused dependencies found:${NC}"
+        for dep in "${unused_deps[@]}"; do
+            echo -e "${BOLD_YELLOW}$dep${NC}"
+        done
     fi
-else
-    echo -e "${BOLD_YELLOW}No changes made.${NC}"
-fi
+
+    # Prompt the user for confirmation to remove unused dependencies
+    read -p "Do you want to remove these unused dependencies? (y/n): " confirm
+    if [[ $confirm == [yY] ]]; then
+        echo -e "${BOLD_CYAN}Removing unused dependencies...${NC}"
+        npm uninstall "${unused_deps[@]}"
+        if [ $? -ne 0 ]; then
+            echo -e "${BOLD_RED}Error occurred while uninstalling dependencies.${NC}"
+        else
+            echo -e "${BOLD_GREEN}Unused dependencies removed.${NC}"
+        fi
+    else
+        echo -e "${BOLD_YELLOW}No changes made.${NC}"
+    fi
+}
+
+# Main flow
+main() {
+    # Ensure jq is installed for parsing package.json
+    ensure_jq
+
+    # Check and remove unused dependencies from package.json
+    clean_unused_dependencies
+}
+
+main
