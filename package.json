@@ -10,10 +10,16 @@
     "build": "node build.js",
     "clean": "bash ./scripts/clean_and_rebuild.sh",
     "prepublishOnly": "npm run build",
+    "changelog": "conventional-changelog -p angular -o CHANGELOG.md",
     "test": "jest"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run changelog"
+    }
   },
   "keywords": [
     "cli",
@@ -33,7 +39,9 @@
   },
   "homepage": "https://github.com/CustomCraft-Software-LLC/ShellScripts#readme",
   "devDependencies": {
+    "conventional-changelog-cli": "^5.0.0",
     "esbuild": "^0.24.0",
+    "husky": "^9.1.6",
     "jest": "^29.7.0"
   },
   "files": [
