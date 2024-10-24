@@ -22,21 +22,21 @@ This document provides an overview of the available commands in the CLI and thei
 
 | Command                                | Description                                         |
 |----------------------------------------|-----------------------------------------------------|
-| `create-component`                     | Create a new component for the project.            |
+| `create-component`                     | Create a new component for the project.             |
 | `create-component-react-native`        | Create a new React Native component.                |
 | `create-screen-react-native`           | Create a new React Native screen.                   |
-| `create-env`                           | Create a `.env` file with default settings.        |
-| `create-route-gatsby`                 | Create a new route in a Gatsby project.            |
+| `create-env`                           | Create a `.env` file with default settings.         |
+| `create-route-gatsby`                  | Create a new route in a Gatsby project.             |
 | `create-hook`                          | Create a custom React hook.                         |
 | `build-size`                           | Get the size of the build.                          |
-| `clean-and-rebuild`                   | Clean and rebuild the project.                      |
+| `clean-and-rebuild`                    | Clean and rebuild the project.                      |
 | `clean-unused-dependencies`            | Remove unused dependencies from the project.        |
 | `setup`                                | Run project setup script.                           |
-| `unused-imports-list`                 | List unused imports in the project.                 |
-| `unused-imports-uninstall`            | Uninstall packages that are no longer imported.    |
+| `unused-imports-list`                  | List unused imports in the project.                 |
+| `unused-imports-uninstall`             | Uninstall packages that are no longer imported.     |
 | `update-dependencies`                  | Update project dependencies.                        |
-| `analyze-bundle`                       | Analyze the project bundle size.                   |
-| `help`                                 | Show this help message.                            |
+| `analyze-bundle`                       | Analyze the project bundle size.                    |
+| `help`                                 | Show this help message.                             |
 
 ## Command Usage
 
@@ -45,6 +45,7 @@ To execute any of the commands listed above, use the following syntax in your te
 ```bash
 npm run <command> [options]
 ```
+
 
 ## Examples
 
